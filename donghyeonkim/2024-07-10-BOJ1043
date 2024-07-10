@@ -1,0 +1,52 @@
+from sys import stdin
+
+
+class WQU:
+    def __init__(self, n):
+        self.nodes = list(range(n + 1))
+        self.sizes = [1] * (n + 1)
+
+    def root(self, i):
+        while i != self.nodes[i]:
+            self.nodes[i] = self.nodes[self.nodes[i]]
+            i = self.nodes[i]
+        return i
+
+    def connected(self, a, b):
+        return self.root(a) == self.root(b)
+
+    def union(self, a, b):
+        i = self.root(a)
+        j = self.root(b)
+
+        if i == j:
+            return None
+
+        if self.sizes[i] < self.sizes[j]:
+            self.nodes[i] = j
+            self.sizes[j] += self.sizes[i]
+        else:
+            self.nodes[j] = i
+            self.sizes[i] += self.sizes[j]
+
+
+n, m = map(int, stdin.readline().split())
+_, *t = map(int, stdin.readline().split())
+
+party = []
+graph = WQU(n)
+
+for i in range(m):
+    p = list(map(int, stdin.readline().split()))[1:]
+    party.append(p)
+
+    for j in range(len(p) - 1):
+        graph.union(p[j], p[j + 1])
+
+for p in party:
+    for i in p:
+        if sum(graph.connected(i, j) for j in t):
+            m -= 1
+            break
+
+print(m)
